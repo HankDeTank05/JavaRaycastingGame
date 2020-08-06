@@ -214,9 +214,19 @@ public class GameState extends State {
                 }
             }
             // strafe left if no wall to your left
-            // TODO: implement strafing left
+            if(km.lStrafe){
+                if(worldMap[(int)(posX - dirY * moveSpeed)][(int)(posY + dirX * moveSpeed)] == 0){
+                    posX -= dirY * moveSpeed;
+                    posY += dirX * moveSpeed;
+                }
+            }
             // strafe right if no wall to your right
-            // TODO: implement strafing right
+            if(km.rStrafe){
+                if(worldMap[(int)(posX + dirY * moveSpeed)][(int)(posY - dirX * moveSpeed)] == 0){
+                    posX += dirY * moveSpeed;
+                    posY -= dirX * moveSpeed;
+                }
+            }
             // rotate to the right
             if(km.rTurn){
                 // both camera direction and camera plane must be rotated
