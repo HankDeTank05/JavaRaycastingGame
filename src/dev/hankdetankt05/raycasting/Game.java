@@ -22,9 +22,6 @@ public class Game implements Runnable{
     private Graphics g;
 
     /* States */
-    // TODO: implement abstract State class
-    // TODO: implement a GameState class
-    // TODO: create an empty placeholder MenuState
     private State gameState;
     private State menuState;
 
@@ -38,7 +35,7 @@ public class Game implements Runnable{
         this.width = width;
         this.height = height;
         this.title = title;
-        // keyManager = new KeyManager()
+        keyManager = new KeyManager();
     }
 
     private void init(){
@@ -64,7 +61,7 @@ public class Game implements Runnable{
 
     }
 
-    private void draw(){
+    private void draw(Graphics g){
         bs = display.getCanvas().getBufferStrategy();
         if(bs == null){
             display.getCanvas().createBufferStrategy(3);
@@ -107,7 +104,7 @@ public class Game implements Runnable{
                 update();
                 lag -= NS_PER_UPDATE;
             }
-            draw();
+            draw(g);
 
         }
 
@@ -142,5 +139,9 @@ public class Game implements Runnable{
 
     public int getHeight() {
         return height;
+    }
+
+    public KeyManager getKeyManager() {
+        return keyManager;
     }
 }

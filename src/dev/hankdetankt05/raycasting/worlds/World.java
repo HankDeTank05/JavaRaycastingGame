@@ -1,6 +1,7 @@
 package dev.hankdetankt05.raycasting.worlds;
 
 import dev.hankdetankt05.raycasting.Handler;
+import dev.hankdetankt05.raycasting.utils.Utils;
 
 import java.awt.*;
 
@@ -23,6 +24,7 @@ public class World {
     public void draw(Graphics g){
         /* vvv RAYCASTING GOES HERE vvv */
 
+//        handler.getGameCamera().draw(g);
 
         /* ^^^ RAYCASTING GOES HERE ^^^ */
     }

@@ -1,10 +1,12 @@
 package dev.hankdetankt05.raycasting;
 
+import dev.hankdetankt05.raycasting.input.KeyManager;
+import dev.hankdetankt05.raycasting.worlds.World;
+
 public class Handler {
 
     private Game game;
-    // TODO: implement a World class
-//    private World world;
+    private World world;
 
     public Handler(Game game){
         this.game = game;
@@ -30,11 +32,19 @@ public class Handler {
         this.game = game;
     }
 
-//    public World getWorld(){
-//        return world;
-//    }
+    public World getWorld(){
+        return world;
+    }
 
-//    public void setWorld(World world){
-//        this.world = world;
+    public void setWorld(World world){
+        this.world = world;
+    }
+
+    public KeyManager getKeyManager() {
+        return game.getKeyManager();
+    }
+
+//    public GameCamera getGameCamera() {
+//        return game.getGameCamera();
 //    }
 }
