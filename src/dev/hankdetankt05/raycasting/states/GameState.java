@@ -13,36 +13,40 @@ public class GameState extends State {
     private static final int DEFAULT_SCREEN_WIDTH = 640,
                              DEFAULT_SCREEN_HEIGHT = 480;
 
-    private int width, height;
+    private static final int TEX_WIDTH = 64, TEX_HEIGHT = 64;
+
+    private int width, height, texWidth, texHeight;
     private double posX, posY, dirX, dirY, planeX, planeY;
 
     private long time, oldTime;
 
+    private int[][] texture;
+
     private int[][] worldMap = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 4, 0, 0, 0, 0, 5, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+        {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7, 7, 7, 7, 7, 7, 7, 7},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 4, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 7, 0, 7, 7, 7, 7, 7},
+        {4, 0, 5, 0, 0, 0, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 7, 0, 0, 0, 7, 7, 7, 1},
+        {4, 0, 6, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 8},
+        {4, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 1},
+        {4, 0, 8, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 8},
+        {4, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 7, 7, 7, 1},
+        {4, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 0, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 1},
+        {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+        {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
+        {6, 6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+        {4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 6, 0, 6, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 2, 0, 0, 5, 0, 0, 2, 0, 0, 0, 2},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2},
+        {4, 0, 6, 0, 6, 0, 0, 0, 0, 4, 6, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 2},
+        {4, 0, 0, 5, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2},
+        {4, 0, 6, 0, 6, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 5, 0, 0, 2, 0, 0, 0, 2},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
+        {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3}
     };
 
     public GameState(Handler handler) {
@@ -51,14 +55,60 @@ public class GameState extends State {
         handler.setWorld(world);
         this.width = DEFAULT_SCREEN_WIDTH;
         this.height = DEFAULT_SCREEN_HEIGHT;
-        this.posX = 22;
-        this.posY = 12;
+        this.texWidth = TEX_WIDTH;
+        this.texHeight = TEX_HEIGHT;
+        this.texture = new int[8][texWidth * texHeight];
+        this.posX = 22.0;
+        this.posY = 11.5;
         this.dirX = -1;
         this.dirY = 0;
         this.planeX = 0;
         this.planeY = 0.66;
         this.time = 0;
         this.oldTime = 0;
+
+        createTextures();
+        textureSwap();
+    }
+
+    private void createTextures(){
+        for(int x = 0; x < texWidth; x++){
+            for(int y = 0; y < texHeight; y++){
+                int xorcolor = (x * 256 / texWidth) ^ (y * 256 / texHeight);
+                //int xcolor = x * 256 / texWidth;
+                int ycolor = y * 256 / texHeight;
+                int xycolor = y * 128 / texHeight + x * 128 / texWidth;
+                int tex0multiplier = 0;
+                int tex5multiplier = 0;
+                if(x != y && x != texWidth - y){
+                    tex0multiplier = 1;
+                }
+                if(x % 16 > 0 && y % 16 > 0){
+                    tex5multiplier = 1;
+                }
+                texture[0][texWidth * y + x] = 65536 * 254 * tex0multiplier;  // flat red texture with black cross
+                texture[1][texWidth * y + x] = xycolor + 256 * xycolor + 65536 * xycolor;  // sloped grayscale
+                texture[2][texWidth * y + x] = 256 * xycolor + 65536 * xycolor;  // sloped yellow gradient
+                texture[3][texWidth * y + x] = xorcolor + 256 * xorcolor + 65536 * xorcolor;  // xor grayscale
+                texture[4][texWidth * y + x] = 256 * xorcolor; // xor green
+                texture[5][texWidth * y + x] = 65536 * 192 * tex5multiplier;  // red bricks
+                texture[6][texWidth * y + x] = 65536 * ycolor;  // red gradient
+                texture[7][texWidth * y + x] = 128 + 256 * 128 + 65536 * 128;  // flat gray texture
+            }
+        }
+    }
+
+    private void textureSwap(){
+        // swap texture x/y since they'll be used as vertical stripes
+        for(int i = 0; i < texture.length; i++){
+            for(int x = 0; x < texWidth; x++){
+                for(int y = 0; y < x; y++){
+                    int temp = texture[i][texWidth * y + x];
+                    texture[i][texWidth * y + x] = texture[i][texWidth * x + y];
+                    texture[i][texWidth * x + y] = temp;
+                }
+            }
+        }
     }
 
     @Override
@@ -141,6 +191,9 @@ public class GameState extends State {
                 perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
             }
 
+            //////////////////////////
+            /* vvv DRAWING CODE vvv */
+
             // calculate height of line to draw on screen
             int lineHeight = (int)(height / perpWallDist);
 
@@ -153,6 +206,51 @@ public class GameState extends State {
             if(drawEnd >= height){
                 drawEnd = height - 1;
             }
+
+            // texturing calculations
+            int texNum = worldMap[mapX][mapY] - 1;  // 1 subtracted from it so that texture 0 can be used!
+
+            // calculate value of wallX
+            double wallX;  // where exactly the wall was hit
+            if(side == 0){
+                wallX = posY + perpWallDist * rayDirY;
+            }
+            else{
+                wallX = posX + perpWallDist * rayDirX;
+            }
+
+            wallX -= Math.floor(wallX);
+
+            // x coordinate on the texture
+            int texX = (int)(wallX * (double)texWidth);
+            if(side == 0 && rayDirX > 0){
+                texX = texWidth - texX - 1;
+            }
+            if(side == 1 && rayDirY < 0){
+                texX = texWidth - texX - 1;
+            }
+
+            // How much to increase the texture coordinate per screen pixel
+            double step = 1.0 * texHeight / lineHeight;
+            // starting texture coordinate
+            double texPos = (drawStart - height / 2 + lineHeight / 2) * step;
+            for(int y = drawStart; y < drawEnd; y++){
+                // cast the texture coordinate to integer and mask with (texHeight - 1) in case of overflow
+                int texY = (int)texPos;
+                texPos += step;
+                int colorNum = texture[texNum][texHeight * texX + texY];
+                // make color darker for y-sides: r, g and b byte each divided through with a "shift" and an "and"
+                Color color = new Color(colorNum);
+                if(side == 1){
+                    for(int i = 0; i < 1; i++) {
+                        color = color.darker();
+                    }
+                }
+                g.setColor(color);
+                g.drawRect(x, y, 1, 1);
+            }
+
+            /*
 
             // choose wall color
             Color  color;
@@ -184,6 +282,11 @@ public class GameState extends State {
             // draw the pixels of the stripe as a vertical line
             g.setColor(color);
             g.drawLine(x, drawStart, x, drawEnd);
+
+            */
+
+            /* ^^^ DRAWING CODE ^^^ */
+            //////////////////////////
 
             // timing for input and FPS counter
             oldTime = time;
