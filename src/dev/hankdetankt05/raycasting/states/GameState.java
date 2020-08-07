@@ -18,6 +18,11 @@ public class GameState extends State {
     private int width, height, texWidth, texHeight;
     private double posX, posY, dirX, dirY, planeX, planeY;
 
+    private double moveSpeed, rotSpeed;
+
+    private double[] perpWallDist, rayDirX, rayDirY;
+    private int[] mapX, mapY, side;
+
     private long time, oldTime;
 
     private int[][] texture;
@@ -67,6 +72,16 @@ public class GameState extends State {
         this.time = 0;
         this.oldTime = 0;
 
+        this.perpWallDist = new double[width];
+        this.rayDirX = new double[width];
+        this.rayDirY = new double[width];
+        this.mapX = new int[width];
+        this.mapY = new int[width];
+        this.side = new int[width];
+
+        this.moveSpeed = handler.getGame().NS_PER_UPDATE * 5.0 / 1000000000;
+        this.rotSpeed = handler.getGame().NS_PER_UPDATE * 3.0 / 1000000000;
+
         createTextures();
         textureSwap();
     }
@@ -111,8 +126,145 @@ public class GameState extends State {
         }
     }
 
+
+    public void move(){
+        // timing for input and FPS counter
+//        oldTime = time;
+//        time = System.nanoTime();
+//        double frameTime = (time - oldTime) / 1000000000.0;
+////            System.out.println(1.0 / frameTime);
+//
+//        double moveSpeed = frameTime * 5.0;  // the constant value is in squares/second
+//        System.out.println("moveSpeed = " + moveSpeed);
+//        double rotSpeed = frameTime * 3.0;  // the constant value is in radians/second
+//        System.out.println("rotSpeed = " + rotSpeed);
+
+        KeyManager km = handler.getKeyManager();
+        // move forward if no wall in front of you
+        if(km.forward){
+            if(worldMap[(int)(posX + dirX * moveSpeed)][(int)posY] == 0){
+                posX += dirX * moveSpeed;
+            }
+            if(worldMap[(int)posX][(int)(posY + dirY * moveSpeed)] == 0){
+                posY += dirY * moveSpeed;
+            }
+        }
+        // move backwards if no wall behind you
+        if(km.backward){
+            if(worldMap[(int)(posX - dirX * moveSpeed)][(int)posY] == 0){
+                posX -= dirX * moveSpeed;
+            }
+            if(worldMap[(int)posX][(int)(posY - dirY * moveSpeed)] == 0){
+                posY -= dirY * moveSpeed;
+            }
+        }
+        // strafe left if no wall to your left
+        if(km.lStrafe){
+            if(worldMap[(int)(posX - dirY * moveSpeed)][(int)(posY + dirX * moveSpeed)] == 0){
+                posX -= dirY * moveSpeed;
+                posY += dirX * moveSpeed;
+            }
+        }
+        // strafe right if no wall to your right
+        if(km.rStrafe){
+            if(worldMap[(int)(posX + dirY * moveSpeed)][(int)(posY - dirX * moveSpeed)] == 0){
+                posX += dirY * moveSpeed;
+                posY -= dirX * moveSpeed;
+            }
+        }
+        // rotate to the right
+        if(km.rTurn){
+            // both camera direction and camera plane must be rotated
+            double oldDirX = dirX;
+            dirX = dirX * Math.cos(-rotSpeed) - dirY * Math.sin(-rotSpeed);
+            dirY = oldDirX * Math.sin(-rotSpeed) + dirY * Math.cos(-rotSpeed);
+            double oldPlaneX = planeX;
+            planeX = planeX * Math.cos(-rotSpeed) - planeY * Math.sin(-rotSpeed);
+            planeY = oldPlaneX * Math.sin(-rotSpeed) + planeY * Math.cos(-rotSpeed);
+        }
+        // rotate to the left
+        if(km.lTurn){
+            // both camera direction and camera plane must be rotated
+            double oldDirX = dirX;
+            dirX = dirX * Math.cos(rotSpeed) - dirY * Math.sin(rotSpeed);
+            dirY = oldDirX * Math.sin(rotSpeed) + dirY * Math.cos(rotSpeed);
+            double oldPlaneX = planeX;
+            planeX = planeX * Math.cos(rotSpeed) - planeY * Math.sin(rotSpeed);
+            planeY = oldPlaneX * Math.sin(rotSpeed) + planeY * Math.cos(rotSpeed);
+        }
+    }
+
     @Override
     public void update() {
+
+        move();
+
+        for(int x = 0; x < width; x++) {
+            // calculate ray position and direction
+            double cameraX = 2 * x / (double) width - 1; // x-coordinate in camera space
+            rayDirX[x] = dirX + planeX * cameraX;
+            rayDirY[x] = dirY + planeY * cameraX;
+
+            // which box of the map we're in
+            mapX[x] = (int) posX;
+            mapY[x] = (int) posY;
+
+            // length of ray from current position to next x or y-side
+            double sideDistX;
+            double sideDistY;
+
+            // length of ray from one x or y-side to next x or y-side
+            double deltaDistX = Math.abs(1 / rayDirX[x]);
+            double deltaDistY = Math.abs(1 / rayDirY[x]);
+//            double perpWallDist;
+
+            // what direction to step in x or y-direction (either +1 or -1)
+            int stepX;
+            int stepY;
+
+            int hit = 0;  // was there a wall hit?
+            side[x] = -1;  // was a NS or a EW wall hit?
+
+            // calculate step and initial sideDist
+            if (rayDirX[x] < 0) {
+                stepX = -1;
+                sideDistX = (posX - mapX[x]) * deltaDistX;
+            } else {
+                stepX = 1;
+                sideDistX = (mapX[x] + 1.0 - posX) * deltaDistX;
+            }
+            if (rayDirY[x] < 0) {
+                stepY = -1;
+                sideDistY = (posY - mapY[x]) * deltaDistY;
+            } else {
+                stepY = 1;
+                sideDistY = (mapY[x] + 1.0 - posY) * deltaDistY;
+            }
+
+            // perform DDA
+            while (hit == 0) {
+                // jump to next map square or in x-direction or in y-direction
+                if (sideDistX < sideDistY) {
+                    sideDistX += deltaDistX;
+                    mapX[x] += stepX;
+                    side[x] = 0;
+                } else {
+                    sideDistY += deltaDistY;
+                    mapY[x] += stepY;
+                    side[x] = 1;
+                }
+                // check if ray has hit a wall
+                if (worldMap[mapX[x]][mapY[x]] > 0) {
+                    hit = 1;
+                }
+            }
+
+            if (side[x] == 0) {
+                perpWallDist[x] = (mapX[x] - posX + (1 - stepX) / 2) / rayDirX[x];
+            } else {
+                perpWallDist[x] = (mapY[x] - posY + (1 - stepY) / 2) / rayDirY[x];
+            }
+        }
 
     }
 
@@ -122,80 +274,14 @@ public class GameState extends State {
         g.setColor(Color.black);
         g.fillRect(0, 0, width, height);
         for(int x = 0; x < width; x++){
-            // calculate ray position and direction
-            double cameraX = 2 * x / (double) width - 1; // x-coordinate in camera space
-            double rayDirX = dirX + planeX * cameraX;
-            double rayDirY = dirY + planeY * cameraX;
 
-            // which box of the map we're in
-            int mapX = (int)posX;
-            int mapY = (int)posY;
-
-            // length of ray from current position to next x or y-side
-            double sideDistX;
-            double sideDistY;
-
-            // length of ray from one x or y-side to next x or y-side
-            double deltaDistX = Math.abs(1 / rayDirX);
-            double deltaDistY = Math.abs(1 / rayDirY);
-            double perpWallDist;
-
-            // what direction to step in x or y-direction (either +1 or -1)
-            int stepX;
-            int stepY;
-
-            int hit = 0;  // was there a wall hit?
-            int side = -1;  // was a NS or a EW wall hit?
-
-            // calculate step and initial sideDist
-            if(rayDirX < 0){
-                stepX = -1;
-                sideDistX = (posX - mapX) * deltaDistX;
-            }
-            else{
-                stepX = 1;
-                sideDistX = (mapX + 1.0 - posX) * deltaDistX;
-            }
-            if(rayDirY < 0){
-                stepY = -1;
-                sideDistY = (posY - mapY) * deltaDistY;
-            }
-            else{
-                stepY = 1;
-                sideDistY = (mapY + 1.0 - posY) * deltaDistY;
-            }
-
-            // perform DDA
-            while(hit == 0){
-                // jump to next map square or in x-direction or in y-direction
-                if(sideDistX < sideDistY){
-                    sideDistX += deltaDistX;
-                    mapX += stepX;
-                    side = 0;
-                }
-                else{
-                    sideDistY += deltaDistY;
-                    mapY += stepY;
-                    side = 1;
-                }
-                // check if ray has hit a wall
-                if(worldMap[mapX][mapY] > 0){
-                    hit = 1;
-                }
-            }
-
-            if(side == 0){
-                perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
-            }
-            else{
-                perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
-            }
+            /* update code was here */
 
             //////////////////////////
             /* vvv DRAWING CODE vvv */
 
             // calculate height of line to draw on screen
-            int lineHeight = (int)(height / perpWallDist);
+            int lineHeight = (int)(height / perpWallDist[x]);
 
             // calculate lowest and highest pixel to fill in current stripe
             int drawStart = -lineHeight / 2 + height / 2;
@@ -208,25 +294,25 @@ public class GameState extends State {
             }
 
             // texturing calculations
-            int texNum = worldMap[mapX][mapY] - 1;  // 1 subtracted from it so that texture 0 can be used!
+            int texNum = worldMap[mapX[x]][mapY[x]] - 1;  // 1 subtracted from it so that texture 0 can be used!
 
             // calculate value of wallX
             double wallX;  // where exactly the wall was hit
-            if(side == 0){
-                wallX = posY + perpWallDist * rayDirY;
+            if(side[x] == 0){
+                wallX = posY + perpWallDist[x] * rayDirY[x];
             }
             else{
-                wallX = posX + perpWallDist * rayDirX;
+                wallX = posX + perpWallDist[x] * rayDirX[x];
             }
 
             wallX -= Math.floor(wallX);
 
             // x coordinate on the texture
             int texX = (int)(wallX * (double)texWidth);
-            if(side == 0 && rayDirX > 0){
+            if(side[x] == 0 && rayDirX[x] > 0){
                 texX = texWidth - texX - 1;
             }
-            if(side == 1 && rayDirY < 0){
+            if(side[x] == 1 && rayDirY[x] < 0){
                 texX = texWidth - texX - 1;
             }
 
@@ -241,7 +327,7 @@ public class GameState extends State {
                 int colorNum = texture[texNum][texHeight * texX + texY];
                 // make color darker for y-sides: r, g and b byte each divided through with a "shift" and an "and"
                 Color color = new Color(colorNum);
-                if(side == 1){
+                if(side[x] == 1){
                     for(int i = 0; i < 1; i++) {
                         color = color.darker();
                     }
@@ -287,69 +373,6 @@ public class GameState extends State {
 
             /* ^^^ DRAWING CODE ^^^ */
             //////////////////////////
-
-            // timing for input and FPS counter
-            oldTime = time;
-            time = System.nanoTime();
-            double frameTime = (time - oldTime) / 1000000000.0;
-//            System.out.println(1.0 / frameTime);
-
-            double moveSpeed = frameTime * 5.0;  // the constant value is in squares/second
-            double rotSpeed = frameTime * 3.0;  // the constant value is in radians/second
-
-            KeyManager km = handler.getKeyManager();
-            // move forward if no wall in front of you
-            if(km.forward){
-                if(worldMap[(int)(posX + dirX * moveSpeed)][(int)posY] == 0){
-                    posX += dirX * moveSpeed;
-                }
-                if(worldMap[(int)posX][(int)(posY + dirY * moveSpeed)] == 0){
-                    posY += dirY * moveSpeed;
-                }
-            }
-            // move backwards if no wall behind you
-            if(km.backward){
-                if(worldMap[(int)(posX - dirX * moveSpeed)][(int)posY] == 0){
-                    posX -= dirX * moveSpeed;
-                }
-                if(worldMap[(int)posX][(int)(posY - dirY * moveSpeed)] == 0){
-                    posY -= dirY * moveSpeed;
-                }
-            }
-            // strafe left if no wall to your left
-            if(km.lStrafe){
-                if(worldMap[(int)(posX - dirY * moveSpeed)][(int)(posY + dirX * moveSpeed)] == 0){
-                    posX -= dirY * moveSpeed;
-                    posY += dirX * moveSpeed;
-                }
-            }
-            // strafe right if no wall to your right
-            if(km.rStrafe){
-                if(worldMap[(int)(posX + dirY * moveSpeed)][(int)(posY - dirX * moveSpeed)] == 0){
-                    posX += dirY * moveSpeed;
-                    posY -= dirX * moveSpeed;
-                }
-            }
-            // rotate to the right
-            if(km.rTurn){
-                // both camera direction and camera plane must be rotated
-                double oldDirX = dirX;
-                dirX = dirX * Math.cos(-rotSpeed) - dirY * Math.sin(-rotSpeed);
-                dirY = oldDirX * Math.sin(-rotSpeed) + dirY * Math.cos(-rotSpeed);
-                double oldPlaneX = planeX;
-                planeX = planeX * Math.cos(-rotSpeed) - planeY * Math.sin(-rotSpeed);
-                planeY = oldPlaneX * Math.sin(-rotSpeed) + planeY * Math.cos(-rotSpeed);
-            }
-            // rotate to the left
-            if(km.lTurn){
-                // both camera direction and camera plane must be rotated
-                double oldDirX = dirX;
-                dirX = dirX * Math.cos(rotSpeed) - dirY * Math.sin(rotSpeed);
-                dirY = oldDirX * Math.sin(rotSpeed) + dirY * Math.cos(rotSpeed);
-                double oldPlaneX = planeX;
-                planeX = planeX * Math.cos(rotSpeed) - planeY * Math.sin(rotSpeed);
-                planeY = oldPlaneX * Math.sin(rotSpeed) + planeY * Math.cos(rotSpeed);
-            }
         }
     }
 }

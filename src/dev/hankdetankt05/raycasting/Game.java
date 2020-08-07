@@ -21,6 +21,9 @@ public class Game implements Runnable{
     private BufferStrategy bs;
     private Graphics g;
 
+    public final int fps = 120;
+    public final long NS_PER_UPDATE = 1000000000 / fps;
+
     /* States */
     private State gameState;
     private State menuState;
@@ -53,7 +56,7 @@ public class Game implements Runnable{
     }
 
     private void update(){
-        keyManager.update();
+//        keyManager.update();
 
         if(State.getState() != null){
             State.getState().update();
@@ -81,16 +84,17 @@ public class Game implements Runnable{
         g.dispose();
     }
 
+    private void processInput(){
+        keyManager.update();
+    }
+
     @Override
     public void run() {
 
         init();
 
-        int fps = 120;
-
         long lastTime = System.nanoTime();
         long lag = 0;
-        long NS_PER_UPDATE = 1000000000 / fps;
 
         // main game loop
         while(running){
@@ -98,7 +102,7 @@ public class Game implements Runnable{
             long elapsed = currentTime - lastTime;
             lastTime = currentTime;
             lag += elapsed;
-            // process input here
+            processInput();
 
             while(lag >= NS_PER_UPDATE){
                 update();
