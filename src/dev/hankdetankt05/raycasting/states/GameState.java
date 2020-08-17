@@ -1,6 +1,7 @@
 package dev.hankdetankt05.raycasting.states;
 
 import dev.hankdetankt05.raycasting.Handler;
+import dev.hankdetankt05.raycasting.input.KeyManager;
 
 import java.awt.*;
 
@@ -40,6 +41,9 @@ public class GameState extends State {
 
     private long time = System.nanoTime(); // time of the current frame
     private long oldTime = System.nanoTime(); // time of the previous frame
+
+    private double moveSpeed = 0.002;
+    private double rotationSpeed = 0.0009;
 
     private int[] lineHeight;
     private Color[] lineColor;
@@ -148,15 +152,21 @@ public class GameState extends State {
 
             // give x and y sides different brightness
             if (side == 1) {
-                color.darker();
+                color = color.darker();
             }
 
             lineColor[x] = color;
         }
+        // timing for input and FPS counter
+        oldTime = time;
+        time = System.nanoTime();
+        long frameTime = (time - oldTime) / 1000000000;
     }
 
     @Override
     public void draw(Graphics g) {
+        g.setColor(Color.black);
+        g.fillRect(0, 0, width, height);
         for(int x = 0; x < width; x++){
             int drawStart = -lineHeight[x] / 2 + height / 2;
             if(drawStart < 0){
@@ -168,6 +178,55 @@ public class GameState extends State {
             }
             g.setColor(lineColor[x]);
             g.drawLine(x, drawStart, x, drawEnd);
+        }
+    }
+
+    public void processInput(KeyManager km){
+
+        // move forward if the W key is pressed
+        if(km.forward){
+            if(worldMap[(int)(posX + dirX * moveSpeed)][(int)posY] == 0){
+                posX += dirX * moveSpeed;
+            }
+            if(worldMap[(int)posX][(int)(posY + dirY * moveSpeed)] == 0){
+                posY += dirY * moveSpeed;
+            }
+        }
+
+        // move backward if the S key is pressed
+        if(km.backward){
+            if(worldMap[(int)(posX - dirX * moveSpeed)][(int)posY] == 0){
+                posX -= dirX * moveSpeed;
+            }
+            if(worldMap[(int)posX][(int)(posY - dirY * moveSpeed)] == 0){
+                posY -= dirY * moveSpeed;
+            }
+        }
+
+        // strafe left if the A key is pressed
+        // TODO: implement strafe left
+
+        // strafe right if the D key is pressed
+        // TODO: implement strafe right
+
+        // rotate left if the left arrow key is pressed
+        if(km.lTurn){
+            double oldDirX = dirX;
+            dirX = dirX * Math.cos(rotationSpeed) - dirY * Math.sin(rotationSpeed);
+            dirY = oldDirX * Math.sin(rotationSpeed) + dirY * Math.cos(rotationSpeed);
+            double oldPlaneX = planeX;
+            planeX = planeX * Math.cos(rotationSpeed) - planeY * Math.sin(rotationSpeed);
+            planeY = oldPlaneX * Math.sin(rotationSpeed) + planeY * Math.cos(rotationSpeed);
+        }
+
+        // rotate right if the right arrow key is pressed
+        if(km.rTurn){
+            double oldDirX = dirX;
+            dirX = dirX * Math.cos(-rotationSpeed) - dirY * Math.sin(-rotationSpeed);
+            dirY = oldDirX * Math.sin(-rotationSpeed) + dirY * Math.cos(-rotationSpeed);
+            double oldPlaneX = planeX;
+            planeX = planeX * Math.cos(-rotationSpeed) - planeY * Math.sin(-rotationSpeed);
+            planeY = oldPlaneX * Math.sin(-rotationSpeed) + planeY * Math.cos(-rotationSpeed);
         }
     }
 }

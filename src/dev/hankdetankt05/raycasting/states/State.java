@@ -1,6 +1,7 @@
 package dev.hankdetankt05.raycasting.states;
 
 import dev.hankdetankt05.raycasting.Handler;
+import dev.hankdetankt05.raycasting.input.KeyManager;
 
 import java.awt.*;
 
@@ -29,4 +30,6 @@ public abstract class State {
 //    public abstract void processInput();
 
     public abstract void draw(Graphics g);
+
+    public abstract void processInput(KeyManager km);
 }

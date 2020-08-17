@@ -56,7 +56,7 @@ public class Game implements Runnable{
     }
 
     private void update(){
-//        keyManager.update();
+        keyManager.update();
 
         if(State.getState() != null){
             State.getState().update();
@@ -72,7 +72,6 @@ public class Game implements Runnable{
         }
         g = bs.getDrawGraphics();
         // clear screen
-        g.setColor(Color.black);
         g.clearRect(0, 0, width, height);
         /* vvv DRAW HERE! vvv */
 
@@ -103,7 +102,7 @@ public class Game implements Runnable{
             long elapsed = currentTime - lastTime;
             lastTime = currentTime;
             lag += elapsed;
-            processInput();
+            State.getState().processInput(keyManager);
 
             while(lag >= NS_PER_UPDATE){
                 update();
