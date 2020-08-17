@@ -26,5 +26,7 @@ public abstract class State {
 
     public abstract void update();
 
+//    public abstract void processInput();
+
     public abstract void draw(Graphics g);
 }
