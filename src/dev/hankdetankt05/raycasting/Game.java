@@ -102,9 +102,9 @@ public class Game implements Runnable{
             long elapsed = currentTime - lastTime;
             lastTime = currentTime;
             lag += elapsed;
-            State.getState().processInput(keyManager);
 
             while(lag >= NS_PER_UPDATE){
+                State.getState().processInput(keyManager);
                 update();
                 lag -= NS_PER_UPDATE;
             }

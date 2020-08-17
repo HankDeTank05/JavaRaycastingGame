@@ -4,49 +4,69 @@ import dev.hankdetankt05.raycasting.Handler;
 import dev.hankdetankt05.raycasting.input.KeyManager;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public class GameState extends State {
 
     private final int mapWidth = 24, mapHeight = 24;
     private final int[][] worldMap = {
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 4, 0, 0, 0, 0, 5, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+        {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7, 7, 7, 7, 7, 7, 7, 7},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7},
+        {4, 0, 4, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 7, 0, 7, 7, 7, 7, 7},
+        {4, 0, 5, 0, 0, 0, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 7, 0, 0, 0, 7, 7, 7, 1},
+        {4, 0, 6, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 8},
+        {4, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 1},
+        {4, 0, 8, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 8},
+        {4, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 7, 7, 7, 1},
+        {4, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 0, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 1},
+        {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+        {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
+        {6, 6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+        {4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 6, 0, 6, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 2, 0, 0, 5, 0, 0, 2, 0, 0, 0, 2},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2},
+        {4, 0, 6, 0, 6, 0, 0, 0, 0, 4, 6, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 2},
+        {4, 0, 0, 5, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2},
+        {4, 0, 6, 0, 6, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 5, 0, 0, 2, 0, 0, 0, 2},
+        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
+        {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3}
     };
 
-    private double posX = 22, posY = 12; // position vector
+    private double posX = 22, posY = 11.5; // position vector
     private double dirX = -1, dirY = 0; // direction vector
     private double planeX = 0, planeY = 0.66; // camera plane vector
 
     private long time = System.nanoTime(); // time of the current frame
     private long oldTime = System.nanoTime(); // time of the previous frame
 
-    private double moveSpeed = 0.002;
-    private double rotationSpeed = 0.0009;
+    private double moveSpeed = 0.05;
+    private double rotationSpeed = 0.03;
 
     private int[] lineHeight;
-    private Color[] lineColor;
+    private int[] drawStart;
+    private int[] drawEnd;
+    private Color[][] drawColor;
+
+    private int texWidth = 64;
+    private int texHeight = 64;
+
+    private Color[][] textures = new Color[8][texWidth*texHeight];
+
+
+    private boolean moveForwardX = false;
+    private boolean moveForwardY = false;
+    private boolean moveBackwardX = false;
+    private boolean moveBackwardY = false;
+    private boolean moveLeftX = false;
+    private boolean moveLeftY = false;
+    private boolean moveRightX = false;
+    private boolean moveRightY = false;
+    private boolean rotateLeft = false;
+    private boolean rotateRight = false;
 
     private int width, height;
 
@@ -55,12 +75,80 @@ public class GameState extends State {
         width = handler.getWidth();
         height = handler.getHeight();
         lineHeight = new int[width];
-        lineColor = new Color[width];
+        drawStart = new int[width];
+        drawEnd = new int[width];
+        drawColor = new Color[width][height];
+
+        generateTextures();
+    }
+
+    private void generateTextures(){
+        for(int x = 0; x < texWidth; x++){
+            for(int y = 0; y < texHeight; y++){
+                int mappedIndex = texWidth * y + x;
+
+                int xorcolor = (x * 256 / texWidth) ^ (y * 256 / texHeight);
+//                int xcolor = x * 256 / texWidth;
+                int ycolor = y * 256 / texHeight;
+                int xycolor = y * 128 / texHeight + x * 128 / texWidth;
+
+                int tex0scalar = 0;
+                if(x != y && x != texWidth - y){
+                    tex0scalar = x;
+                }
+
+                int tex5scalar = 0;
+                if(x % 16 > 0 && y % 16 > 0){
+                    tex5scalar = 1;
+                }
+
+                textures[0][mappedIndex] = new Color(65536 * 254 * tex0scalar); //flat red texture with black cross
+                textures[1][mappedIndex] = new Color(xycolor + 256 * xycolor + 65536 * xycolor); //sloped greyscale
+                textures[2][mappedIndex] = new Color(256 * xycolor + 65536 * xycolor); //sloped yellow gradient
+                textures[3][mappedIndex] = new Color(xorcolor + 256 * xorcolor + 65536 * xorcolor); //xor greyscale
+                textures[4][mappedIndex] = new Color(256 * xorcolor); //xor green
+                textures[5][mappedIndex] = new Color(65536 * 192 * tex5scalar); //red bricks
+                textures[6][mappedIndex] = new Color(65536 * ycolor); //red gradient
+                textures[7][mappedIndex] = new Color(128 + 256 * 128 + 65536 * 128); //flat grey texture
+            }
+        }
     }
 
     @Override
     public void update() {
         for(int x = 0; x < width; x++) {
+
+            if(moveForwardX){
+
+            }
+            if(moveForwardY){
+
+            }
+            if(moveBackwardX){
+
+            }
+            if(moveBackwardY){
+
+            }
+            if(moveLeftX){
+
+            }
+            if(moveLeftY){
+
+            }
+            if(moveRightX){
+
+            }
+            if(moveRightY){
+
+            }
+            if(rotateLeft){
+
+            }
+            if(rotateRight){
+
+            }
+
             // calculate ray position and direction
             double cameraX = 2 * x / (double) width - 1; // x-coordinate in camera space
             double rayDirX = dirX + planeX * cameraX;
@@ -130,37 +218,81 @@ public class GameState extends State {
             // calculate height of line to draw on screen
             lineHeight[x] = (int) (height / perpWallDist);
 
-            // choose wall color
-            Color color;
-            switch (worldMap[mapX][mapY]) {
-                case 1:
-                    color = Color.red;
-                    break;
-                case 2:
-                    color = Color.green;
-                    break;
-                case 3:
-                    color = Color.blue;
-                    break;
-                case 4:
-                    color = Color.white;
-                    break;
-                default:
-                    color = Color.yellow;
-                    break;
+            drawStart[x] = -lineHeight[x] / 2 + height / 2;
+            if(drawStart[x] < 0){
+                drawStart[x] = 0;
+            }
+            drawEnd[x] = lineHeight[x] / 2 + height / 2;
+            if(drawEnd[x] >= height){
+                drawEnd[x] = height - 1;
             }
 
-            // give x and y sides different brightness
-            if (side == 1) {
-                color = color.darker();
+//            // choose wall color
+//            Color color;
+//            switch (worldMap[mapX][mapY]) {
+//                case 1:
+//                    color = Color.red;
+//                    break;
+//                case 2:
+//                    color = Color.green;
+//                    break;
+//                case 3:
+//                    color = Color.blue;
+//                    break;
+//                case 4:
+//                    color = Color.white;
+//                    break;
+//                default:
+//                    color = Color.yellow;
+//                    break;
+//            }
+//
+//            // give x and y sides different brightness
+//            if (side == 1) {
+//                color = color.darker();
+//            }
+//
+//            lineColor[x] = color;
+
+            // texturing calculations
+            int texNum = worldMap[mapX][mapY] - 1; // 1 is subtracted from it so that texture 0 can be used!
+
+            // calculate the value of wallX
+            double wallX; // where exactly the wall was hit
+            if(side == 0){
+                wallX = posY + perpWallDist * rayDirY;
+            }
+            else{
+                wallX = posX + perpWallDist * rayDirX;
+            }
+            wallX -= Math.floor((wallX));
+
+            // x-coordinate on the texture
+            int texX = (int)(wallX * (double)texWidth);
+            if(side == 0 && rayDirX > 0){
+                texX = texWidth - texX - 1;
+            }
+            if(side == 1 && rayDirY < 0){
+                texX = texWidth - texX - 1;
             }
 
-            lineColor[x] = color;
+            // how much to increase the texture coordinate per screen pixel
+            double step = 1.0 * texHeight / lineHeight[x];
+            // starting texture coordinate
+            double texPos = (drawStart[x] - height / 2 + lineHeight[x] / 2) * step;
+            for(int y = drawStart[x]; y < drawEnd[x]; y++){
+                // cast the texture coordinate to an integer
+                int texY = (int)texPos & (texHeight - 1);
+                texPos += step;
+                int mappedIndex = texHeight * texY + texX;
+                Color color = textures[texNum][mappedIndex];
+                // make color darker for y-sides
+                if(side == 1){
+                    color = color.darker();
+                }
+                drawColor[x][y] = color;
+            }
         }
-        // timing for input and FPS counter
-        oldTime = time;
-        time = System.nanoTime();
-        long frameTime = (time - oldTime) / 1000000000;
     }
 
     @Override
@@ -168,28 +300,36 @@ public class GameState extends State {
         g.setColor(Color.black);
         g.fillRect(0, 0, width, height);
         for(int x = 0; x < width; x++){
-            int drawStart = -lineHeight[x] / 2 + height / 2;
-            if(drawStart < 0){
-                drawStart = 0;
+            for(int y = drawStart[x]; y < drawEnd[x]; y++){
+                g.setColor(drawColor[x][y]);
+                g.drawLine(x, y, x, y);
             }
-            int drawEnd = lineHeight[x] / 2 + height / 2;
-            if(drawEnd >= height){
-                drawEnd = height - 1;
-            }
-            g.setColor(lineColor[x]);
-            g.drawLine(x, drawStart, x, drawEnd);
+//            g.setColor(lineColor[x]);
+//            g.drawLine(x, drawStart, x, drawEnd);
         }
     }
 
     public void processInput(KeyManager km){
+        moveForwardX = false;
+        moveForwardY = false;
+        moveBackwardX = false;
+        moveBackwardY = false;
+        moveLeftX = false;
+        moveLeftY = false;
+        moveRightX = false;
+        moveRightY = false;
+        rotateLeft = false;
+        rotateRight = false;
 
         // move forward if the W key is pressed
         if(km.forward){
             if(worldMap[(int)(posX + dirX * moveSpeed)][(int)posY] == 0){
                 posX += dirX * moveSpeed;
+                moveForwardX = true;
             }
             if(worldMap[(int)posX][(int)(posY + dirY * moveSpeed)] == 0){
                 posY += dirY * moveSpeed;
+                moveForwardY = true;
             }
         }
 
@@ -197,9 +337,11 @@ public class GameState extends State {
         if(km.backward){
             if(worldMap[(int)(posX - dirX * moveSpeed)][(int)posY] == 0){
                 posX -= dirX * moveSpeed;
+                moveBackwardX = true;
             }
             if(worldMap[(int)posX][(int)(posY - dirY * moveSpeed)] == 0){
                 posY -= dirY * moveSpeed;
+                moveBackwardY = true;
             }
         }
 
