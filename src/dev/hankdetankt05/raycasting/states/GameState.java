@@ -1,9 +1,11 @@
 package dev.hankdetankt05.raycasting.states;
 
 import dev.hankdetankt05.raycasting.Handler;
+import dev.hankdetankt05.raycasting.gfx.Assets;
 import dev.hankdetankt05.raycasting.input.KeyManager;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class GameState extends State {
@@ -49,12 +51,12 @@ public class GameState extends State {
     private int[] lineHeight;
     private int[] drawStart;
     private int[] drawEnd;
-    private Color[][] drawColor;
+    private BufferedImage[] drawColumn;
 
     private int texWidth = 64;
     private int texHeight = 64;
 
-    private Color[][] textures = new Color[8][texWidth*texHeight];
+    private BufferedImage[][] textures = new BufferedImage[8][texWidth];
 
 
     private boolean moveForwardX = false;
@@ -77,14 +79,14 @@ public class GameState extends State {
         lineHeight = new int[width];
         drawStart = new int[width];
         drawEnd = new int[width];
-        drawColor = new Color[width][height];
+        drawColumn = new BufferedImage[width];
 
         generateTextures();
     }
 
     private void generateTextures(){
         for(int x = 0; x < texWidth; x++){
-            for(int y = 0; y < texHeight; y++){
+            for(int y = 0; y < texHeight; y++) {
                 int mappedIndex = texWidth * y + x;
 
                 int xorcolor = (x * 256 / texWidth) ^ (y * 256 / texHeight);
@@ -93,24 +95,25 @@ public class GameState extends State {
                 int xycolor = y * 128 / texHeight + x * 128 / texWidth;
 
                 int tex0scalar = 0;
-                if(x != y && x != texWidth - y){
+                if (x != y && x != texWidth - y) {
                     tex0scalar = x;
                 }
 
                 int tex5scalar = 0;
-                if(x % 16 > 0 && y % 16 > 0){
+                if (x % 16 > 0 && y % 16 > 0) {
                     tex5scalar = 1;
                 }
-
-                textures[0][mappedIndex] = new Color(65536 * 254 * tex0scalar); //flat red texture with black cross
-                textures[1][mappedIndex] = new Color(xycolor + 256 * xycolor + 65536 * xycolor); //sloped greyscale
-                textures[2][mappedIndex] = new Color(256 * xycolor + 65536 * xycolor); //sloped yellow gradient
-                textures[3][mappedIndex] = new Color(xorcolor + 256 * xorcolor + 65536 * xorcolor); //xor greyscale
-                textures[4][mappedIndex] = new Color(256 * xorcolor); //xor green
-                textures[5][mappedIndex] = new Color(65536 * 192 * tex5scalar); //red bricks
-                textures[6][mappedIndex] = new Color(65536 * ycolor); //red gradient
-                textures[7][mappedIndex] = new Color(128 + 256 * 128 + 65536 * 128); //flat grey texture
             }
+
+            textures[0][x] = Assets.eagle.getSubimage(x, 0, 1, texHeight); //flat red texture with black cross
+            textures[1][x] = Assets.redbrick.getSubimage(x, 0, 1, texHeight); //sloped greyscale
+            textures[2][x] = Assets.purplestone.getSubimage(x, 0, 1, texHeight); //sloped yellow gradient
+            textures[3][x] = Assets.greystone.getSubimage(x, 0, 1, texHeight); //xor greyscale
+            textures[4][x] = Assets.bluestone.getSubimage(x, 0, 1, texHeight); //xor green
+            textures[5][x] = Assets.mossy.getSubimage(x, 0, 1, texHeight); //red bricks
+            textures[6][x] = Assets.wood.getSubimage(x, 0, 1, texHeight); //red gradient
+            textures[7][x] = Assets.colorstone.getSubimage(x, 0, 1, texHeight); //flat grey texture
+
         }
     }
 
@@ -172,7 +175,6 @@ public class GameState extends State {
             int stepY;
 
             int hit = 0; // was a wall hit?
-            // TODO: if there are rendering problems, the following line of code might be the cause
             int side = 0; // was a NS wall or an EW wall hit?
 
             if (rayDirX < 0) {
@@ -219,9 +221,9 @@ public class GameState extends State {
             lineHeight[x] = (int) (height / perpWallDist);
 
             drawStart[x] = -lineHeight[x] / 2 + height / 2;
-            if(drawStart[x] < 0){
-                drawStart[x] = 0;
-            }
+//            if(drawStart[x] < 0){
+//                drawStart[x] = 0;
+//            }
             drawEnd[x] = lineHeight[x] / 2 + height / 2;
             if(drawEnd[x] >= height){
                 drawEnd[x] = height - 1;
@@ -280,18 +282,13 @@ public class GameState extends State {
             double step = 1.0 * texHeight / lineHeight[x];
             // starting texture coordinate
             double texPos = (drawStart[x] - height / 2 + lineHeight[x] / 2) * step;
-            for(int y = drawStart[x]; y < drawEnd[x]; y++){
-                // cast the texture coordinate to an integer
-                int texY = (int)texPos & (texHeight - 1);
-                texPos += step;
-                int mappedIndex = texHeight * texY + texX;
-                Color color = textures[texNum][mappedIndex];
-                // make color darker for y-sides
-                if(side == 1){
-                    color = color.darker();
-                }
-                drawColor[x][y] = color;
-            }
+
+            BufferedImage image = textures[texNum][texX];
+            // make color darker for y-sides
+//                if(side == 1){
+//                    color = color.darker();
+//                }
+            drawColumn[x] = image;
         }
     }
 
@@ -300,12 +297,7 @@ public class GameState extends State {
         g.setColor(Color.black);
         g.fillRect(0, 0, width, height);
         for(int x = 0; x < width; x++){
-            for(int y = drawStart[x]; y < drawEnd[x]; y++){
-                g.setColor(drawColor[x][y]);
-                g.drawLine(x, y, x, y);
-            }
-//            g.setColor(lineColor[x]);
-//            g.drawLine(x, drawStart, x, drawEnd);
+            g.drawImage(drawColumn[x], x, drawStart[x], 1, lineHeight[x], null);
         }
     }
 

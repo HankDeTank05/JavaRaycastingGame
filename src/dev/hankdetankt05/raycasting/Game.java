@@ -1,6 +1,7 @@
 package dev.hankdetankt05.raycasting;
 
 import dev.hankdetankt05.raycasting.display.Display;
+import dev.hankdetankt05.raycasting.gfx.Assets;
 import dev.hankdetankt05.raycasting.input.KeyManager;
 import dev.hankdetankt05.raycasting.states.GameState;
 import dev.hankdetankt05.raycasting.states.MenuState;
@@ -46,7 +47,7 @@ public class Game implements Runnable{
         display = new Display(title, width, height);
         display.getFrame().addKeyListener(keyManager);
         // TODO: implement the Assets class
-//        Assets.init();
+        Assets.init();
 
         handler = new Handler(this);
 
