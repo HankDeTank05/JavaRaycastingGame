@@ -38,7 +38,7 @@ public class Game implements Runnable{
         this.width = width;
         this.height = height;
         this.title = title;
-        // keyManager = new KeyManager()
+        keyManager = new KeyManager();
     }
 
     private void init(){
@@ -72,6 +72,7 @@ public class Game implements Runnable{
         }
         g = bs.getDrawGraphics();
         // clear screen
+        g.setColor(Color.black);
         g.clearRect(0, 0, width, height);
         /* vvv DRAW HERE! vvv */
 
