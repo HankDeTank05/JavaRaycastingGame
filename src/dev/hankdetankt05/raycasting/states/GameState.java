@@ -12,30 +12,30 @@ public class GameState extends State {
 
     private final int mapWidth = 24, mapHeight = 24;
     private final int[][] worldMap = {
-        {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7, 7, 7, 7, 7, 7, 7, 7},
-        {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7},
-        {4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7},
-        {4, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7},
-        {4, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7},
-        {4, 0, 4, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 7, 0, 7, 7, 7, 7, 7},
-        {4, 0, 5, 0, 0, 0, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 7, 0, 0, 0, 7, 7, 7, 1},
-        {4, 0, 6, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 8},
-        {4, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 1},
-        {4, 0, 8, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 8},
-        {4, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 7, 7, 7, 1},
-        {4, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 0, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 1},
-        {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
-        {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-        {6, 6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
-        {4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 6, 0, 6, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3},
-        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
-        {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 2, 0, 0, 5, 0, 0, 2, 0, 0, 0, 2},
-        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2},
-        {4, 0, 6, 0, 6, 0, 0, 0, 0, 4, 6, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 2},
-        {4, 0, 0, 5, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2},
-        {4, 0, 6, 0, 6, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 5, 0, 0, 2, 0, 0, 0, 2},
-        {4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6, 0, 6, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
-        {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3}
+        {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 4, 4, 6, 4, 4, 6, 4, 6, 4, 4, 4, 6, 4},
+        {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
+        {8, 0, 3, 3, 0, 0, 0, 0, 0, 8, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6},
+        {8, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6},
+        {8, 0, 3, 3, 0, 0, 0, 0, 0, 8, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
+        {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 4, 6},
+        {8, 8, 8, 8, 0, 8, 8, 8, 8, 8, 8, 4, 4, 4, 4, 4, 4, 6, 0, 0, 0, 0, 0, 6},
+        {7, 7, 7, 7, 0, 7, 7, 7, 7, 0, 8, 0, 8, 0, 8, 0, 8, 4, 0, 4, 0, 6, 0, 6},
+        {7, 7, 0, 0, 0, 0, 0, 0, 7, 8, 0, 8, 0, 8, 0, 8, 8, 6, 0, 0, 0, 0, 0, 6},
+        {7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0, 0, 0, 4},
+        {7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 6, 0, 6, 0, 6},
+        {7, 7, 0, 0, 0, 0, 0, 0, 7, 8, 0, 8, 0, 8, 0, 8, 8, 6, 4, 6, 0, 6, 6, 6},
+        {7, 7, 7, 7, 0, 7, 7, 7, 7, 8, 8, 4, 0, 6, 8, 4, 8, 3, 3, 3, 0, 3, 3, 3},
+        {2, 2, 2, 2, 0, 2, 2, 2, 2, 4, 6, 4, 0, 0, 6, 0, 6, 3, 0, 0, 0, 0, 0, 3},
+        {2, 2, 0, 0, 0, 0, 0, 2, 2, 4, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 3},
+        {2, 0, 0, 0, 0, 0, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 3},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 6, 0, 6, 3, 3, 0, 0, 0, 3, 3},
+        {2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 1, 2, 2, 2, 6, 6, 0, 0, 5, 0, 5, 0, 5},
+        {2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 2, 2, 0, 5, 0, 5, 0, 0, 0, 5, 5},
+        {2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 5, 0, 5, 0, 5},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5},
+        {2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 5, 0, 5, 0, 5},
+        {2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 2, 2, 0, 5, 0, 5, 0, 0, 0, 5, 5},
+        {2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5}
     };
 
     private double posX = 22, posY = 11.5; // position vector
@@ -52,23 +52,19 @@ public class GameState extends State {
     private int[] drawStart;
     private int[] drawEnd;
     private BufferedImage[] drawColumn;
+    private Color[][] drawFloorCeiling;
 
     private int texWidth = 64;
     private int texHeight = 64;
 
+    private static String[] fcms = {"none", "scanline", "vertical"};
+    public static final int floorcastingMethod = 0;
+    private static final int floorTexture = 3;
+    private static final int ceilingTexture = 6;
+
+    private static final int renderRes = 1;
+
     private BufferedImage[][] textures = new BufferedImage[8][texWidth];
-
-
-    private boolean moveForwardX = false;
-    private boolean moveForwardY = false;
-    private boolean moveBackwardX = false;
-    private boolean moveBackwardY = false;
-    private boolean moveLeftX = false;
-    private boolean moveLeftY = false;
-    private boolean moveRightX = false;
-    private boolean moveRightY = false;
-    private boolean rotateLeft = false;
-    private boolean rotateRight = false;
 
     private int width, height;
 
@@ -80,30 +76,13 @@ public class GameState extends State {
         drawStart = new int[width];
         drawEnd = new int[width];
         drawColumn = new BufferedImage[width];
+        drawFloorCeiling = new Color[width][height];
 
         generateTextures();
     }
 
     private void generateTextures(){
         for(int x = 0; x < texWidth; x++){
-            for(int y = 0; y < texHeight; y++) {
-                int mappedIndex = texWidth * y + x;
-
-                int xorcolor = (x * 256 / texWidth) ^ (y * 256 / texHeight);
-//                int xcolor = x * 256 / texWidth;
-                int ycolor = y * 256 / texHeight;
-                int xycolor = y * 128 / texHeight + x * 128 / texWidth;
-
-                int tex0scalar = 0;
-                if (x != y && x != texWidth - y) {
-                    tex0scalar = x;
-                }
-
-                int tex5scalar = 0;
-                if (x % 16 > 0 && y % 16 > 0) {
-                    tex5scalar = 1;
-                }
-            }
 
             textures[0][x] = Assets.eagle.getSubimage(x, 0, 1, texHeight); //flat red texture with black cross
             textures[1][x] = Assets.redbrick.getSubimage(x, 0, 1, texHeight); //sloped greyscale
@@ -119,38 +98,63 @@ public class GameState extends State {
 
     @Override
     public void update() {
-        for(int x = 0; x < width; x++) {
+        // FLOOR CASTING
+        if(fcms[floorcastingMethod].equalsIgnoreCase("scanline")) {
+            for (int y = 0; y < height; y+=renderRes) {
+                // rayDir for leftmost ray (x = 0) and rightmost ray (x = width)
+                float rayDirX0 = (float) (dirX - planeX);
+                float rayDirY0 = (float) (dirY - planeY);
+                float rayDirX1 = (float) (dirX + planeX);
+                float rayDirY1 = (float) (dirY + planeY);
 
-            if(moveForwardX){
+                // current y position compared to the center of the screen (the horizon)
+                int p = y - height / 2;
 
+                // vertical position of the camera
+                float posZ = (float) (0.5 * height);
+
+                // horizontal distance from the camera to the floor for the current row.
+                // 0.5 is the z position exacttly in the middle between floor and ceiling
+                float rowDistance = posZ / p;
+
+                // calculate the real world step vector we have to add for each x (parallel to camera plane)
+                // adding step by step avoids multiplications with a weight in the inner loop
+                float floorStepX = rowDistance * (rayDirX1 - rayDirX0) / width;
+                float floorStepY = rowDistance * (rayDirY1 - rayDirY0) / width;
+
+                // real world coordinates of the leftmost column. this will be updated as we step to the right
+                float floorX = (float) (posX + rowDistance * rayDirX0);
+                float floorY = (float) (posY + rowDistance * rayDirY0);
+
+                for (int x = 0; x < width; ++x) {
+                    // the cell coord is simply got from the integer parts of floorX and floorY
+                    int cellX = (int) floorX;
+                    int cellY = (int) floorY;
+
+                    // get the texture coordinate frmo the fractional part
+                    int tx = (int) (texWidth * (floorX - cellX)) & (texWidth - 1);
+                    int ty = (int) (texHeight * (floorY - cellY)) & (texHeight - 1);
+
+                    floorX += floorStepX;
+                    floorY += floorStepY;
+
+                    // choose texture and draw the pixel
+                    Color color;
+
+                    // floor
+                    color = new Color(textures[floorTexture][tx].getRGB(0, ty));
+                    color = color.darker();
+                    drawFloorCeiling[x][y] = color;
+
+                    // ceiling (symmetrical, at height - y - 1 instead of y)
+                    color = new Color(textures[ceilingTexture][tx].getRGB(0, ty));
+                    color = color.darker();
+                    drawFloorCeiling[x][height - y - 1] = color;
+                }
             }
-            if(moveForwardY){
-
-            }
-            if(moveBackwardX){
-
-            }
-            if(moveBackwardY){
-
-            }
-            if(moveLeftX){
-
-            }
-            if(moveLeftY){
-
-            }
-            if(moveRightX){
-
-            }
-            if(moveRightY){
-
-            }
-            if(rotateLeft){
-
-            }
-            if(rotateRight){
-
-            }
+        }
+        // WALL CASTING
+        for(int x = 0; x < width; x+=renderRes) {
 
             // calculate ray position and direction
             double cameraX = 2 * x / (double) width - 1; // x-coordinate in camera space
@@ -289,6 +293,58 @@ public class GameState extends State {
 //                    color = color.darker();
 //                }
             drawColumn[x] = image;
+
+            if(fcms[floorcastingMethod].equalsIgnoreCase("vertical")){
+                // FLOOR CASTING (vertical version, directly after drawing the vertical walls tripe for the current x)
+                double floorXWall, floorYWall; // x, y position of the floor texel at the bottom of the wall
+
+                // 4 different wall directions possible
+                if(side == 0 && rayDirX > 0){
+                    floorXWall = mapX;
+                    floorYWall = mapY + wallX;
+                }
+                else if(side == 0 && rayDirX < 0){
+                    floorXWall = mapX + 1.0;
+                    floorYWall = mapY + wallX;
+                }
+                else if(side == 1 && rayDirY > 0){
+                    floorXWall = mapX + wallX;
+                    floorYWall = mapY;
+                }
+                else{
+                    floorXWall = mapX + wallX;
+                    floorYWall = mapY + 1.0;
+                }
+
+                double distWall, distPlayer, currentDist;
+
+                distWall = perpWallDist;
+                distPlayer = 0.0;
+
+                // TODO: this might cause problems with drawing the image columns!
+                if (drawEnd[x] < 0) {
+                    drawEnd[x] = height;
+                }
+
+                // draw the floor from drawEnd to the bottom of the screen
+                for(int y = drawEnd[x] + 1; y < height; y+=renderRes){
+                    currentDist = height / (2.0 * y - height); // you could make a small lookup table for this instead
+
+                    double weight = (currentDist - distPlayer) / (distWall - distPlayer);
+
+                    double currentFloorX = weight * floorXWall + (1.0 - weight) * posX;
+                    double currentFloorY = weight * floorYWall + (1.0 - weight) * posY;
+
+                    int floorTexX, floorTexY;
+                    floorTexX = (int)(currentFloorX * texWidth) % texWidth;
+                    floorTexY = (int)(currentFloorY * texHeight) % texHeight;
+
+                    // floor
+                    drawFloorCeiling[x][y] = new Color(textures[floorTexture][floorTexX].getRGB(0, floorTexY)).darker();
+                    // ceiling
+                    drawFloorCeiling[x][height-y] = new Color(textures[ceilingTexture][floorTexX].getRGB(0, floorTexY)).darker();
+                }
+            }
         }
     }
 
@@ -297,31 +353,36 @@ public class GameState extends State {
         g.setColor(Color.black);
         g.fillRect(0, 0, width, height);
         for(int x = 0; x < width; x++){
+            if(fcms[floorcastingMethod].equalsIgnoreCase("scanline") || fcms[floorcastingMethod].equalsIgnoreCase("vertical")) {
+                for (int y = 0; y < drawEnd[x]; y+=renderRes) {
+                    g.setColor(drawFloorCeiling[x][y]);
+                    g.drawLine(x, y, x, y);
+                }
+
+                int adjustedDrawStart = drawStart[x];
+                if (adjustedDrawStart < 0) {
+                    adjustedDrawStart = 0;
+                }
+
+                for (int y = adjustedDrawStart; y < height; y+=renderRes) {
+                    g.setColor(drawFloorCeiling[x][y]);
+                    g.drawLine(x, y, x, y);
+                }
+            }
             g.drawImage(drawColumn[x], x, drawStart[x], 1, lineHeight[x], null);
         }
     }
 
+    @Override
     public void processInput(KeyManager km){
-        moveForwardX = false;
-        moveForwardY = false;
-        moveBackwardX = false;
-        moveBackwardY = false;
-        moveLeftX = false;
-        moveLeftY = false;
-        moveRightX = false;
-        moveRightY = false;
-        rotateLeft = false;
-        rotateRight = false;
 
         // move forward if the W key is pressed
         if(km.forward){
             if(worldMap[(int)(posX + dirX * moveSpeed)][(int)posY] == 0){
                 posX += dirX * moveSpeed;
-                moveForwardX = true;
             }
             if(worldMap[(int)posX][(int)(posY + dirY * moveSpeed)] == 0){
                 posY += dirY * moveSpeed;
-                moveForwardY = true;
             }
         }
 
@@ -329,11 +390,9 @@ public class GameState extends State {
         if(km.backward){
             if(worldMap[(int)(posX - dirX * moveSpeed)][(int)posY] == 0){
                 posX -= dirX * moveSpeed;
-                moveBackwardX = true;
             }
             if(worldMap[(int)posX][(int)(posY - dirY * moveSpeed)] == 0){
                 posY -= dirY * moveSpeed;
-                moveBackwardY = true;
             }
         }
 

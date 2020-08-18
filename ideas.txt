@@ -1,0 +1,10 @@
+for updating:
+- multi-thread the raycasting operation. one thread per quadrant of the screen?
+
+for drawing:
+- use the command pattern: every pixel to draw is a command object and the draw method just loops through an array of
+  command objects
+- don't create a new color object for pixels of the same color. instead, create one color object for each unique color
+  on the screen and associate it with an array of (x,y) coordinate pairs where that color should be drawn
+- draw every pixel as a filled, colored rectangle, so that when you need to decrease the render resolution, you can
+  increase the rectangle size to make it look pixelated
