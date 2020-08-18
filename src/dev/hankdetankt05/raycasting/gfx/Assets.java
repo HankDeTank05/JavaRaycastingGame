@@ -6,7 +6,7 @@ public class Assets {
 
     private static final int width = 64, height = 64, scale = 1;
 
-    public static BufferedImage eagle, redbrick, purplestone, greystone, bluestone, mossy, wood, colorstone;
+    public static BufferedImage eagle, redbrick, purplestone, greystone, bluestone, mossy, wood, colorstone, barrel, pillar, greenlight;
 
     public static void init(){
         eagle = ImageLoader.loadImage("/textures/eagle.png");
@@ -17,5 +17,8 @@ public class Assets {
         mossy = ImageLoader.loadImage("/textures/mossy.png");
         wood = ImageLoader.loadImage("/textures/wood.png");
         colorstone = ImageLoader.loadImage("/textures/colorstone.png");
+        barrel = ImageLoader.loadImage("/textures/barrel.png");
+        pillar = ImageLoader.loadImage("/textures/pillar.png");
+        greenlight = ImageLoader.loadImage("/textures/greenlight.png");
     }
 }

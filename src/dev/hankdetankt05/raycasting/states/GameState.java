@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class GameState extends State {
 
-    private final int mapWidth = 24, mapHeight = 24;
+    private final int mapWidth = 24, mapHeight = 24, numSprites = 19;
     private final int[][] worldMap = {
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 4, 4, 6, 4, 4, 6, 4, 6, 4, 4, 4, 6, 4},
         {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
@@ -58,13 +58,51 @@ public class GameState extends State {
     private int texHeight = 64;
 
     private static String[] fcms = {"none", "scanline", "vertical"};
-    public static final int floorcastingMethod = 0;
+    public static final int floorcastingMethod = 1;
     private static final int floorTexture = 3;
     private static final int ceilingTexture = 6;
 
     private static final int renderRes = 1;
 
-    private BufferedImage[][] textures = new BufferedImage[8][texWidth];
+    private BufferedImage[][] textures = new BufferedImage[11][texWidth];
+
+    private static final double[][] sprites = {
+            {20.5, 11.5, 10}, // green light in front of playerstart
+            // green lights in every room
+            {18.5, 4.5, 10},
+            {10.0, 4.5, 10},
+            {10.0, 12.5, 10},
+            {3.5, 6.5, 10},
+            {3.5, 20.5, 10},
+            {3.5, 14.5, 10},
+            {14.5, 20.5, 10},
+
+            // row of pillars in front of wall: fisheye test
+            {18.5, 10.5, 9},
+            {18.5, 11.5, 9},
+            {18.5, 12.5, 9},
+
+            // some barrels around the map
+            {21.5, 1.5, 8},
+            {15.5, 1.5, 8},
+            {16.0, 1.8, 8},
+            {16.2, 1.2, 8},
+            {3.5, 2.5, 8},
+            {9.5, 15.5, 8},
+            {10.0, 15.1, 8},
+            {10.5, 15.8, 8}
+    };
+
+    private double[] ZBuffer;
+    private int[] spriteOrder;
+    private double[] spriteDistance;
+    private BufferedImage[] drawSprites;
+    private int[] drawSpritesStart;
+    private int[] drawSpritesEnd;
+    private int[] drawSpritesHeight;
+    private int[] spriteStripeWidth;
+
+    private static boolean spriteCasting = false;
 
     private int width, height;
 
@@ -77,6 +115,14 @@ public class GameState extends State {
         drawEnd = new int[width];
         drawColumn = new BufferedImage[width];
         drawFloorCeiling = new Color[width][height];
+        ZBuffer = new double[width];
+        spriteOrder = new int[numSprites];
+        spriteDistance = new double[numSprites];
+        drawSprites = new BufferedImage[width];
+        drawSpritesStart = new int[width];
+        drawSpritesEnd = new int[width];
+        drawSpritesHeight = new int[width];
+        spriteStripeWidth = new int[width];
 
         generateTextures();
     }
@@ -84,16 +130,65 @@ public class GameState extends State {
     private void generateTextures(){
         for(int x = 0; x < texWidth; x++){
 
-            textures[0][x] = Assets.eagle.getSubimage(x, 0, 1, texHeight); //flat red texture with black cross
-            textures[1][x] = Assets.redbrick.getSubimage(x, 0, 1, texHeight); //sloped greyscale
-            textures[2][x] = Assets.purplestone.getSubimage(x, 0, 1, texHeight); //sloped yellow gradient
-            textures[3][x] = Assets.greystone.getSubimage(x, 0, 1, texHeight); //xor greyscale
-            textures[4][x] = Assets.bluestone.getSubimage(x, 0, 1, texHeight); //xor green
-            textures[5][x] = Assets.mossy.getSubimage(x, 0, 1, texHeight); //red bricks
-            textures[6][x] = Assets.wood.getSubimage(x, 0, 1, texHeight); //red gradient
-            textures[7][x] = Assets.colorstone.getSubimage(x, 0, 1, texHeight); //flat grey texture
+            // surface textures
+            textures[0][x] = Assets.eagle.getSubimage(x, 0, 1, texHeight);
+            textures[1][x] = Assets.redbrick.getSubimage(x, 0, 1, texHeight);
+            textures[2][x] = Assets.purplestone.getSubimage(x, 0, 1, texHeight);
+            textures[3][x] = Assets.greystone.getSubimage(x, 0, 1, texHeight);
+            textures[4][x] = Assets.bluestone.getSubimage(x, 0, 1, texHeight);
+            textures[5][x] = Assets.mossy.getSubimage(x, 0, 1, texHeight);
+            textures[6][x] = Assets.wood.getSubimage(x, 0, 1, texHeight);
+            textures[7][x] = Assets.colorstone.getSubimage(x, 0, 1, texHeight);
 
+            // sprite textures
+            textures[8][x] = Assets.barrel.getSubimage(x, 0, 1, texHeight);
+            textures[9][x] = Assets.pillar.getSubimage(x, 0, 1, texHeight);
+            textures[10][x] = Assets.greenlight.getSubimage(x, 0, 1, texHeight);
+
+            for(int y = 0; y < texHeight; y++){
+                if(textures[8][x].getRGB(0, y) == Color.black.getRGB()){
+                    textures[8][x].setRGB(0, y, new Color(0, 0, 0, 255).getRGB());
+                }
+                if(textures[9][x].getRGB(0, y) == Color.black.getRGB()){
+                    textures[9][x].setRGB(0, y, new Color(0, 0, 0, 255).getRGB());
+                }
+                if(textures[10][x].getRGB(0, y) == Color.black.getRGB()){
+                    textures[10][x].setRGB(0, y, new Color(0, 0, 0, 255).getRGB());
+                }
+            }
         }
+    }
+
+    private void sortSprites(int[] order, double[] dist, int amount){
+        int endOfSortedSection = 0;
+        while(endOfSortedSection < amount){
+            int smallestIndex = findIndexOfSmallest(dist);
+            swap(order, endOfSortedSection, smallestIndex);
+            swap(dist, endOfSortedSection, smallestIndex);
+            endOfSortedSection++;
+        }
+    }
+
+    private int findIndexOfSmallest(double[] arr){
+        int smallestIndex = 0;
+        for(int i = 1; i < arr.length; i++){
+            if(arr[i] < arr[smallestIndex]){
+                smallestIndex = i;
+            }
+        }
+        return smallestIndex;
+    }
+
+    private void swap(double[] arr, int ia, int ib){
+        double temp = arr[ia];
+        arr[ia] = arr[ib];
+        arr[ib] = temp;
+    }
+
+    private void swap(int[] arr, int ia, int ib){
+        int temp = arr[ia];
+        arr[ia] = arr[ib];
+        arr[ib] = temp;
     }
 
     @Override
@@ -345,6 +440,79 @@ public class GameState extends State {
                     drawFloorCeiling[x][height-y] = new Color(textures[ceilingTexture][floorTexX].getRGB(0, floorTexY)).darker();
                 }
             }
+            // SET THE ZBUFFER FOR TEH SPRITE CASTING
+            ZBuffer[x] = perpWallDist;
+
+            if(spriteCasting) {
+                // SPRITE CASTING
+                // sort sprites from far to close
+                for (int i = 0; i < numSprites; i++) {
+                    spriteOrder[i] = i;
+                    spriteDistance[i] = ((posX - sprites[i][0]) * (posX - sprites[i][0]) + (posY - sprites[i][1]) * (posY - sprites[i][1]));
+                }
+
+                sortSprites(spriteOrder, spriteDistance, numSprites);
+
+                // after sorting the sprites, do the projection and draw them
+                for (int i = 0; i < numSprites; i++) {
+                    // translate sprite position relative to camera
+                    double spriteX = sprites[spriteOrder[i]][0] - posX;
+                    double spriteY = sprites[spriteOrder[i]][1] - posY;
+
+                    // transform sprite with the inverse camera matrix
+                    // [ planeX     dirX ] - 1                                      [ dirY       -dirX ]
+                    // [                 ]      = 1/(planeX*dirY - dirX*planeY) *   [                  ]
+                    // [ planeY     dirY ]                                          [ -planeY   planeX ]
+
+                    double invDet = 1.0 / (planeX * dirY - dirX * planeY); // required for correct matrix multiplication
+
+                    double transformX = invDet * (dirY * spriteX - dirX * spriteY);
+                    double transformY = invDet * (-planeY * spriteX + planeX * spriteY); // this is actually the depth inside the screen, that is what Z is in 3D
+
+                    int spriteScreenX = (int) ((width / 2) * (1 + transformX / transformY));
+
+                    // calculate height of the sprite on screen
+                    drawSpritesHeight[x] = Math.abs((int) (height / (transformY))); // using transformY instead of real distance prevents fisheye
+                    // calculate lowest and highest pixel to fill in current stripe
+                    drawSpritesStart[x] = -drawSpritesHeight[x] / 2 + height / 2;
+//                if(drawStartY < 0){
+//                    drawStartY = 0;
+//                }
+                    drawSpritesEnd[x] = drawSpritesHeight[x] / 2 + height / 2;
+//                if(drawEndY >= height){
+//                    drawEndY = height - 1;
+//                }
+
+                    // calculate width of the sprite
+                    int spriteWidth = Math.abs((int) (height / (transformY)));
+                    int drawStartX = -spriteWidth / 2 + spriteScreenX;
+                    if (drawStartX < 0) {
+                        drawStartX = 0;
+                    }
+                    int drawEndX = spriteWidth / 2 + spriteScreenX;
+                    if (drawEndX >= width) {
+                        drawEndX = width - 1;
+                    }
+
+                    // loop through every vertical stripe of the sprite on screen
+                    for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
+                        spriteStripeWidth[stripe] = spriteWidth / texWidth;
+//                    if(spriteStripeWidth[stripe] <= 0){
+//                        spriteStripeWidth[stripe] = 1;
+//                    }
+                        texX = (int) (256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+                        // the conditions in the if are:
+                        // 1) it's in front of camera plane so you don't see things behind you
+                        // 2) it's on the screen (left)
+                        // 3) it's on the screen (right)
+                        // 4) XBuffer, with perpendicular distance
+                        if (transformY > 0 && stripe > 0 && stripe < width && transformY < ZBuffer[stripe]) {
+                            BufferedImage spriteStripe = textures[(int) sprites[spriteOrder[i]][2]][texX];
+                            drawSprites[stripe] = spriteStripe;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -370,6 +538,12 @@ public class GameState extends State {
                 }
             }
             g.drawImage(drawColumn[x], x, drawStart[x], 1, lineHeight[x], null);
+            if(spriteCasting) {
+                if (drawSprites[x] != null) {
+                    g.drawImage(drawSprites[x], x, drawSpritesStart[x], spriteStripeWidth[x], drawSpritesHeight[x], null);
+                    drawSprites[x] = null;
+                }
+            }
         }
     }
 
